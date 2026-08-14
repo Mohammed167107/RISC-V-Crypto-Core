@@ -282,10 +282,11 @@ See [`LICENSE`](LICENSE) for the full text.
 
 ## Author / Contact
 
-**[Your Name]**
-- LinkedIn: [add link]
-- Email: [add email]
-- Discord: [add handle]
+**Mohammad Shobaki**
+- Communications and computer engineering student
+- LinkedIn: https://www.linkedin.com/in/mohammad-shobaki/
+- Email: mohammedshobaky8@gmail.com
+- Discord: @uicheater
 
 Feedback, questions, and contributions are welcome — this is an active,
 solo research effort, and outside perspective is genuinely valuable at
