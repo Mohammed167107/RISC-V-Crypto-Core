@@ -167,7 +167,7 @@ cd RISC-V-Crypto-Core
 ### 2. Install the RISC-V toolchain
 
 Download the **xPack RISC-V GCC toolchain** for your platform:
-👉 https://xpack.github.io/riscv-none-elf-gcc/
+👉 [https://xpack.github.io/riscv-none-elf-gcc/](https://xpack-dev-tools.github.io/riscv-none-elf-gcc-xpack/blog/2025/10/23/riscv-none-elf-gcc-v15-2-0-1-released/)
 
 Extract it anywhere on disk, then open `test.py` and point `TOOLCHAIN_BIN`
 at the `bin` folder inside your extracted copy:
