@@ -139,7 +139,7 @@ restructuring (see [Roadmap](#roadmap)).
 ## Prerequisites
 
 - **Python 3**
-- **[xPack RISC-V GCC toolchain](https://xpack.github.io/riscv-none-elf-gcc/)**
+- **[xPack RISC-V GCC toolchain][(https://xpack.github.io/riscv-none-elf-gcc/](https://xpack-dev-tools.github.io/riscv-none-elf-gcc-xpack/blog/2025/10/23/riscv-none-elf-gcc-v15-2-0-1-released))**
   (`riscv-none-elf-gcc`) — update the `TOOLCHAIN_BIN` path in `test.py` to
   point at your local install:
   ```python
