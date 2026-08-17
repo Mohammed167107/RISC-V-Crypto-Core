@@ -300,13 +300,15 @@ produces two hex files for simulation:
 
 ## Running the Simulation
 
-1. Load `instructions.hex` into `i_mem` and `dmem.hex` into `d_mem` via
-   `$readmemh` (wiring depends on your simulator setup / testbench).
-2. Run the testbench in `processor.v` (`p_tb`):
+1. change directory in modelsim to the right folder and then Compile the design using:
+   ```bash
+   vlog pack.v
+   ```
+3. Run the testbench in `processor.v` (`p_tb`):
    ```bash
    vsim p_tb
    ```
-3. The testbench clocks the design and watches `PC`. When execution
+4. The testbench clocks the design and watches `PC`. When execution
    reaches the halt loop (`_start`'s trailing `j` self-loop, currently
    hardcoded as `PC == 32'h00000008`), it dumps a fixed address range of
    `DMEM` to a log file.
@@ -327,10 +329,6 @@ original `.data` address. Concretely:
   depends on the stack pointer value set in `_start` and each function's
   local frame size — **recompute this from the disassembly (`h.dis`) if
   `start.s` or `linker.ld` changes**, rather than assuming a fixed address.
-
-**Important:** only sample memory *after* the CPU has actually reached the
-halt loop. Sampling mid-execution shows partially-swapped, in-flight
-values that can look plausible but aren't the final result.
 
 ---
 
