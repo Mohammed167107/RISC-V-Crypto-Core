@@ -20,6 +20,7 @@ this project is ultimately aimed at is upcoming, not yet implemented.
 - [Supported Instructions](#supported-instructions)
 - [Repository Structure](#repository-structure)
 - [Prerequisites](#prerequisites)
+- [Getting Started](#getting-started)
 - [Building a Program](#building-a-program)
 - [Running the Simulation](#running-the-simulation)
 - [Verifying Output](#verifying-output)
@@ -148,6 +149,127 @@ restructuring (see [Roadmap](#roadmap)).
 
 ---
 
+## Getting Started
+
+This walks through the full workflow end-to-end: getting the repo,
+installing the toolchain, writing a C program, building it, and running it
+on the core in simulation. The sections after this one ([Building a
+Program](#building-a-program), [Running the Simulation](#running-the-simulation))
+go into more detail on individual steps — use this section as the overview.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Mohammed167107/RISC-V-Crypto-Core.git
+cd RISC-V-Crypto-Core
+```
+
+### 2. Install the RISC-V toolchain
+
+Download the **xPack RISC-V GCC toolchain** for your platform:
+👉 https://xpack.github.io/riscv-none-elf-gcc/
+
+Extract it anywhere on disk, then open `test.py` and point `TOOLCHAIN_BIN`
+at the `bin` folder inside your extracted copy:
+
+```python
+TOOLCHAIN_BIN = r"C:\path\to\xpack-riscv-none-elf-gcc-<version>\bin"
+```
+
+(On macOS/Linux, use a normal forward-slash path instead, e.g.
+`"/opt/xpack-riscv-none-elf-gcc-<version>/bin"`.)
+
+Confirm the toolchain works on its own before going further:
+
+```bash
+"<TOOLCHAIN_BIN>/riscv-none-elf-gcc" --version
+```
+
+### 3. Install ModelSim
+
+Any edition that supports Verilog-2001 and `$readmemh` works; the free
+ModelSim Intel FPGA Starter Edition (or a student license) is sufficient.
+No special project setup is required beyond adding `processor.v` (which
+also contains the current testbench, `p_tb`) to a ModelSim project/library.
+
+### 4. Write or edit a C program
+
+The program under test lives in `h.c`. It must be **freestanding** — no
+`stdio.h`, no dynamic allocation, no OS assumptions — since it runs
+directly on bare hardware with no runtime support beyond what `start.s`
+provides. `<stdint.h>` (for fixed-width types like `int32_t`) is fine to
+use.
+
+```c
+#include <stdint.h>
+
+int main(void) {
+    // your code here
+}
+```
+
+`main` is the required entry point — `start.s` calls into it directly
+after setting up the stack. If `main` returns, execution falls into an
+infinite loop (there's no OS to return control to).
+
+### 5. Build
+
+From the repo root, with the toolchain path configured:
+
+```bash
+python test.py
+```
+
+On success this produces:
+- `h.elf` — the linked binary
+- `h.dis` — full disassembly (useful for finding exact memory addresses
+  of your variables — see [Verifying Output](#verifying-output))
+- `instructions.hex` — for loading into `IMEM`
+- `dmem.hex` — for loading into `DMEM`
+
+If this fails, check [Building a Program](#building-a-program) below for
+what each compiler flag does, and the
+[Known Limitations](#known-limitations-and-honesty-notes) section for
+issues that have come up before (e.g. linker section-overlap errors).
+
+### 6. Load the program into the simulator
+
+In your ModelSim testbench (or directly via the transcript/console),
+load both hex files into the corresponding memories before running the
+clock:
+
+```verilog
+initial begin
+    $readmemh("instructions.hex", uut.i_mem.memory);
+    $readmemh("dmem.hex", uut.d_mem.memory);
+end
+```
+
+(Adjust the hierarchical paths if your instance names differ from
+`i_mem`/`d_mem`.)
+
+### 7. Run the simulation
+
+```bash
+vsim p_tb
+run -all
+```
+
+Or, from the ModelSim GUI: compile `processor.v`, load `p_tb` as the
+simulation target, add signals of interest (at minimum `PC`) to a
+waveform, and run.
+
+### 8. Check the result
+
+Once execution reaches the halt loop, inspect the relevant `DMEM` address
+range (either in the waveform viewer, or via a memory dump if you're
+using the logging testbench) and compare against what your C program
+should have produced. See [Verifying Output](#verifying-output) for how
+to work out *which* addresses to look at, and a caution about sampling
+timing.
+
+---
+
 ## Building a Program
 
 ```bash
@@ -221,6 +343,10 @@ gaps here deliberately, rather than glossing over them:
   computing expected stack addresses by hand from the disassembly, then
   visually inspecting simulator waveforms or a dumped memory log —
   there's no automated pass/fail assertion yet.
+- **The halt-detection address is hardcoded** (`PC == 32'h00000008`),
+  tied to this specific program's build. It will silently fail to detect
+  completion (and the simulation will run forever) if the linker script,
+  `start.s`, or the program changes such that the halt loop moves.
 - **Only one test program exists** (bubble sort). It exercises loads,
   stores, branches, and function calls, but not the RV32M multiply/divide
   instructions, nor any crypto-relevant workload.
