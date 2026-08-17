@@ -221,15 +221,6 @@ gaps here deliberately, rather than glossing over them:
   computing expected stack addresses by hand from the disassembly, then
   visually inspecting simulator waveforms or a dumped memory log —
   there's no automated pass/fail assertion yet.
-- **The testbench's file logging has a bug.** `p_tb` calls `$display(log_fh, ...)`
-  where `$fdisplay(log_fh, ...)` is needed — `$display` ignores the file
-  handle argument and writes to the simulation console instead, so
-  `sim_log.txt` will not contain the intended log output as currently
-  written.
-- **The halt-detection address is hardcoded** (`PC == 32'h00000008`),
-  tied to this specific program's build. It will silently fail to detect
-  completion (and the simulation will run forever) if the linker script,
-  `start.s`, or the program changes such that the halt loop moves.
 - **Only one test program exists** (bubble sort). It exercises loads,
   stores, branches, and function calls, but not the RV32M multiply/divide
   instructions, nor any crypto-relevant workload.
@@ -239,10 +230,6 @@ gaps here deliberately, rather than glossing over them:
 - **Single-cycle only.** No pipelining, so no hazard/forwarding logic
   exists — this simplifies correctness but limits performance analysis
   relevance for now.
-- **DMEM/IMEM overlap at address `0x0`** is intentional (Harvard-style,
-  separate physical memories) but relies on `-Wl,--no-check-sections` to
-  build — this is a real design choice, not an oversight, but worth
-  flagging for anyone reusing the linker script elsewhere.
 
 ---
 
