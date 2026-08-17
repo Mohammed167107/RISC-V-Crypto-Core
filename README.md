@@ -361,8 +361,6 @@ gaps here deliberately, rather than glossing over them:
 
 ## Roadmap
 
-- [ ] Fix `$display`/`$fdisplay` bug in the current testbench
-- [ ] Parametrize halt-detection address instead of hardcoding it per build
 - [ ] Self-checking testbench with automated PASS/FAIL comparison against expected output
 - [ ] Additional test programs (multiply/divide-heavy, memory-intensive, control-flow-heavy)
 - [ ] UVM verification environment (monitor + scoreboard) for reusable, program-agnostic testing
